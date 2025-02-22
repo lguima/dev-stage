@@ -3,12 +3,16 @@ services:
     image: postgres:17.4
     container_name: postgres-nlw
     restart: always
+    volumes:
+      - db-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=postgres
     ports:
       - "5432:5432"
     networks:
       - nlw-network
+volumes:
+  db-data:
 networks:
   nlw-network:
     driver: bridge
