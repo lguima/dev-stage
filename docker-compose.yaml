@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:17.4
+    container_name: postgres-nlw
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - nlw-network
+networks:
+  nlw-network:
+    driver: bridge
