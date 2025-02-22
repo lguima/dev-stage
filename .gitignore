@@ -10,7 +10,7 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files #
+# Package Files
 *.jar
 *.war
 *.nar
@@ -35,6 +35,18 @@ buildNumber.properties
 # https://github.com/takari/maven-wrapper#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
 
+HELP.md
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Spring Tool Suite (STS)
+.apt_generated
+.factorypath
+.settings
+.springBeans
+.sts4-cache
+
 # Eclipse m2e generated files
 # Eclipse Core
 .project
@@ -43,6 +55,25 @@ buildNumber.properties
 
 # IntelliJ IDEA
 .idea/
+*.iws
+*.iml
+*.ipr
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Visual Studio Code (VSCode)
+.vscode/
 
 # ASDF
 .tool-versions
+
+# Environment Variables
+.env
