@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="DevStage" src="./assets/images/dev-stage.svg" width="150">  
+  <img alt="DevStage" src="./assets/images/dev-stage.svg">  
 </p>
 
 <p align="center">
