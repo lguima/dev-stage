@@ -1,5 +1,8 @@
 package br.com.nlw.devstage.controllers;
 
+import br.com.nlw.devstage.dto.ErrorMessage;
+import br.com.nlw.devstage.exceptions.EventNotFoundException;
+import br.com.nlw.devstage.exceptions.InvalidIndicationException;
 import br.com.nlw.devstage.models.Event;
 import br.com.nlw.devstage.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,5 +35,28 @@ public class EventController {
     }
 
     return ResponseEntity.ok().body(event);
+  }
+
+  @GetMapping("/events/{eventName}/rankings/subscribers")
+  public ResponseEntity<?> getSubscribersRanking(@PathVariable String eventName) {
+    try {
+      return ResponseEntity.ok().body(eventService.getSubscribersRanking(eventName).subList(0, 3));
+    } catch (EventNotFoundException e) {
+      return ResponseEntity.status(404).body(new ErrorMessage(e.getMessage()));
+    }
+  }
+
+  @GetMapping("/events/{eventName}/rankings/subscribers/users/{subscriberId}")
+  public ResponseEntity<?> getSubscribersRanking(
+    @PathVariable String eventName,
+    @PathVariable Integer subscriberId
+  ) {
+    try {
+      return ResponseEntity.ok().body(eventService.getSubscribersRankingByUser(eventName, subscriberId));
+    } catch (EventNotFoundException e) {
+      return ResponseEntity.status(404).body(new ErrorMessage(e.getMessage()));
+    } catch (InvalidIndicationException e) {
+      return ResponseEntity.status(400).body(new ErrorMessage(e.getMessage()));
+    }
   }
 }
