@@ -1,15 +1,27 @@
-spring
-    config:
-        import: optional:file:.env[.properties]
-    application
-        name=${APP_NAME:devstage}
-    devtools
-        add-properties=${DEV_TOOLS_ADD_PROPERTIES:false}
-        livereload
-            enabled=${DEV_TOOLS_LIVE_RELOAD_ENABLED:false}
-    jpa
-        show-sql=${JPA_SHOW_SQL:false}
-    datasource
-        url=jdbc:postgresql://${POSTGRES_HOST:}:${POSTGRES_PORT:}/${POSTGRES_DB:}
-        username=${POSTGRES_USERNAME:}
-        password=${POSTGRES_PASSWORD:}
+spring:
+  config:
+    import: optional:file:.env[.properties]
+
+  application:
+    name=${APP_NAME:devstage}
+
+  # Spring Boot DevTools
+  devtools:
+    add-properties: ${DEV_TOOLS_ADD_PROPERTIES:false}
+    livereload:
+        enabled: ${DEV_TOOLS_LIVE_RELOAD_ENABLED:false}
+
+  logging:
+    level:
+      root: ${LOGGING_LEVEL_ROOT:}
+      web: ${LOGGING_LEVEL_WEB:}
+
+  # Java Persistence API (JPA)
+  jpa:
+    open-in-view: ${JPA_OPEN_IN_VIEW:false}
+    show-sql: ${JPA_SHOW_SQL:false}
+
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:}:${POSTGRES_PORT:}/${POSTGRES_DB:}
+    username: ${POSTGRES_USERNAME:}
+    password: ${POSTGRES_PASSWORD:}
