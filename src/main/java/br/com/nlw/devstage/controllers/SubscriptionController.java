@@ -36,8 +36,10 @@ public class SubscriptionController {
       }
 
       return ResponseEntity.ok().body(subscription);
-    } catch (EventNotFoundException | InvalidIndicationException e) {
+    } catch (EventNotFoundException e) {
       return ResponseEntity.status(404).body(new ErrorMessage(e.getMessage()));
+    } catch (InvalidIndicationException e) {
+      return ResponseEntity.status(400).body(new ErrorMessage(e.getMessage()));
     } catch (SubscriptionConflictException e) {
       return ResponseEntity.status(409).body(new ErrorMessage(e.getMessage()));
     }
