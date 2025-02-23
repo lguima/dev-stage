@@ -2,7 +2,7 @@ package br.com.nlw.devstage.services;
 
 import br.com.nlw.devstage.dto.SubscriptionResponse;
 import br.com.nlw.devstage.exceptions.EventNotFoundException;
-import br.com.nlw.devstage.exceptions.IndicationUserNotFoundException;
+import br.com.nlw.devstage.exceptions.InvalidIndicationException;
 import br.com.nlw.devstage.exceptions.SubscriptionConflictException;
 import br.com.nlw.devstage.models.Event;
 import br.com.nlw.devstage.models.Subscription;
@@ -29,7 +29,7 @@ public class SubscriptionService {
   @Autowired
   private SubscriptionRepository subscriptionRepository;
 
-  public SubscriptionResponse createSubscription(String eventName, User user, Integer indicationUserId) {
+  public SubscriptionResponse createSubscription(String eventName, User user, Integer subscriptionNumber) {
     Event event = eventRepository.findByPrettyName(eventName);
 
     if (event == null) {
@@ -37,40 +37,53 @@ public class SubscriptionService {
     }
 
     User existingUser = userRepository.findByEmail(user.getEmail());
-    User subscriber = Objects.requireNonNullElseGet(existingUser, () -> userRepository.save(user));
 
-    User indicationUser = null;
+    Subscription subscriptionIndication = null;
 
-    if (indicationUserId != null) {
-      indicationUser = userRepository.findById(indicationUserId).orElse(null);
+    if (subscriptionNumber != null) {
+      subscriptionIndication = subscriptionRepository.findBySubscriptionNumber(subscriptionNumber);
 
-      if (indicationUser == null) {
-        throw new IndicationUserNotFoundException(indicationUserId);
+      if (subscriptionIndication == null) {
+        throw new InvalidIndicationException();
       }
     }
 
-    Subscription existingSubscription = subscriptionRepository.findByEventAndSubscriber(event, subscriber);
-
-    if (existingSubscription != null) {
-      throw new SubscriptionConflictException(existingSubscription);
+    // Same subscriber and indicator.
+    if (existingUser != null && subscriptionIndication != null && subscriptionIndication.getSubscriber().getId().equals(existingUser.getId())) {
+      throw new InvalidIndicationException();
     }
+
+    // Different event from subscription indication.
+    if (subscriptionIndication != null && subscriptionIndication.getEvent().getEventId() != event.getEventId()) {
+      throw new InvalidIndicationException();
+    }
+
+    if (existingUser != null) {
+      Subscription existingSubscription = subscriptionRepository.findByEventAndSubscriber(event, existingUser);
+
+      if (existingSubscription != null) {
+        throw new SubscriptionConflictException(existingSubscription);
+      }
+    }
+
+    User subscriber = Objects.requireNonNullElseGet(existingUser, () -> userRepository.save(user));
 
     Subscription subscription = new Subscription();
     subscription.setEvent(event);
     subscription.setSubscriber(subscriber);
 
-    if (indicationUser != null) {
-      subscription.setIndication(indicationUser);
+    if (subscriptionIndication != null) {
+      subscription.setIndication(subscriptionIndication.getSubscriber());
     }
 
     Subscription savedSubscription = subscriptionRepository.save(subscription);
 
-    return new SubscriptionResponse(savedSubscription.getSubscriptionNumber(), this.getIndicationUrl(event, subscriber));
+    return new SubscriptionResponse(savedSubscription.getSubscriptionNumber(), this.getIndicationUrl(event, subscription));
   }
 
-  public String getIndicationUrl(Event event, User subscriber) {
+  public String getIndicationUrl(Event event, Subscription subscription) {
     try {
-      return new URI("http://localhost:8080/subscriptions/" + event.getPrettyName() + "/" + subscriber.getId()).toURL().toString();
+      return new URI("http://localhost:8080/subscriptions/" + event.getPrettyName() + "/" + subscription.getSubscriptionNumber()).toURL().toString();
     } catch (URISyntaxException | MalformedURLException e) {
       return null;
     }
